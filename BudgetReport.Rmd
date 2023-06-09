@@ -1,0 +1,91 @@
+---
+title: "Budget Report"
+author: "David Barron"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+
+opts_chunk$set(echo = FALSE)
+
+inline_hook <- function(x){
+  
+  format(x, scientific = FALSE, big.mark = ",")
+  
+  
+}
+
+knit_hooks$set(inline = inline_hook)
+
+```
+
+## Income and Expenditure Report
+
+
+```{r pastdata, echo=FALSE, message=FALSE}
+
+library(readxl)
+library(tidyverse)
+
+dta <- read_xlsx("C:\\Users\\dnbar\\Dropbox\\TASO\\Accounts 2022-23\\TASO 2022-23.xlsm",
+                 sheet = "Transactions",
+                 skip = 4,
+                 col_names = c("Date", "Ref", "Details", "Expenditure", "Income",
+                               "Balance", "Income Category", "Expenditure Category",
+                               "Funding Category", "I/E", "Amount", "I/E Category"
+                               ),
+                 col_types = c("date", rep("guess", 11)))
+
+dta.sum <- dta %>%
+          mutate(Date = lubridate::ymd(Date),
+                 Month = lubridate::month(Date)) %>%
+        group_by(Month) %>%
+        summarise(
+         Expend = sum(Expenditure, na.rm = TRUE),
+         Inc = sum(Income, na.rm = TRUE)
+        ) 
+
+# Reorder rows
+
+  dta.sum <- dta.sum[c(7:12, 1:6), ]
+  dta.sum$Month <- as.numeric(row.names(dta.sum))
+
+dta.sum <-  dta.sum %>%
+    mutate(
+          Income = cumsum(Inc),
+          Expenditure = cumsum(Expend)
+        ) %>%
+        select(Month, Income, Expenditure)
+
+
+dta.long <- dta.sum %>% pivot_longer(
+              cols = Income:Expenditure,
+              names_to = "Type",
+              values_to = "Amount"
+              ) 
+  
+
+          
+
+```
+
+
+
+```{r plot, echo=FALSE}
+dta.long  %>%
+  ggplot(aes(x = Month, y = Amount, colour = Type)) + 
+          geom_line() + scale_x_continuous(
+            breaks = 1:12,
+            label =  c(month.abb[7:12], month.abb[1:6])
+          ) + 
+  scale_y_continuous(label = scales::label_dollar(prefix="£")) +
+  theme_light() +
+  theme(legend.position=c(0.2, 0.85), legend.title = element_blank()) 
+          
+
+
+```
+
+The current deficit is £`r -(dta.sum[12,2] - dta.sum[12,3])`. 
