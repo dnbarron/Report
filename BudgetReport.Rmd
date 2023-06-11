@@ -12,7 +12,7 @@ opts_chunk$set(echo = FALSE)
 
 inline_hook <- function(x){
   
-  format(x, scientific = FALSE, big.mark = ",")
+  format(x, nsmall = 2, scientific = FALSE, big.mark = ",")
   
   
 }
@@ -38,6 +38,9 @@ dta <- read_xlsx("C:\\Users\\dnbar\\Dropbox\\TASO\\Accounts 2022-23\\TASO 2022-2
                                ),
                  col_types = c("date", rep("guess", 11)))
 
+nrows <- nrow(dta)
+Bank_Balance <- as.numeric(dta[nrows, "Balance"])
+
 dta.sum <- dta %>%
           mutate(Date = lubridate::ymd(Date),
                  Month = lubridate::month(Date)) %>%
@@ -45,12 +48,27 @@ dta.sum <- dta %>%
         summarise(
          Expend = sum(Expenditure, na.rm = TRUE),
          Inc = sum(Income, na.rm = TRUE)
-        ) 
+        ) %>%
+        mutate(Month = case_when(
+                          Month == 7 ~ 1,
+                          Month == 8 ~ 2,
+                          Month == 9 ~ 3,
+                          Month == 10 ~ 4,
+                          Month == 11 ~ 5,
+                          Month == 12 ~ 6, 
+                          Month == 1 ~ 7,
+                          Month == 2 ~ 8,
+                          Month == 3 ~ 9,
+                          Month == 4 ~ 10,
+                          Month == 5 ~ 11,
+                          Month == 6 ~ 12)) %>%
+       arrange(Month)
 
 # Reorder rows
 
-  dta.sum <- dta.sum[c(7:12, 1:6), ]
-  dta.sum$Month <- as.numeric(row.names(dta.sum))
+  
+  
+  #dta.sum$Month <- as.numeric(row.names(dta.sum))
 
 dta.sum <-  dta.sum %>%
     mutate(
@@ -74,11 +92,16 @@ dta.long <- dta.sum %>% pivot_longer(
 
 
 ```{r plot, echo=FALSE}
+num.months <- dim(dta.sum)[1]
+
+all.months <- c(month.abb[7:12], month.abb[1:6])
+labels = all.months[1:num.months]
+
 dta.long  %>%
   ggplot(aes(x = Month, y = Amount, colour = Type)) + 
           geom_line() + scale_x_continuous(
-            breaks = 1:12,
-            label =  c(month.abb[7:12], month.abb[1:6])
+            breaks = 1:num.months,
+            label =  labels
           ) + 
   scale_y_continuous(label = scales::label_dollar(prefix="£")) +
   theme_light() +
@@ -88,4 +111,13 @@ dta.long  %>%
 
 ```
 
-The current deficit is £`r -(dta.sum[12,2] - dta.sum[12,3])`. 
+This report provides a summary of current income and expenditure on a striclty cash basis for the TASO financial year 2023-24, providing comparisons with the 2022-23 financial year.  No account is taken of payments made or received that relate to activities in a different financial year (although such adjustments are of course made in our annual accounts).  This should not affect the trends shown in the chart, because these payments generally repeat every year.  For example, payments are made in advance to Rewley House to book their lecture theatre for study days in the financial year before they occur, but this happens every year.
+
+---
+
+- Current total income is £`r as.numeric(dta.sum[num.months, 2])`
+
+- Current total expenditure is £`r as.numeric(dta.sum[num.months, 3])`
+
+- **The current deficit is £`r -(dta.sum[num.months,2] - dta.sum[num.months,3])`**. 
+- Current bank balance £`r Bank_Balance`.
