@@ -2,13 +2,16 @@
 title: "Treasurer's Report"
 author: "David Barron"
 date: "`r Sys.Date()`"
-output: html_document
+output: 
+  html_document
 ---
 
 ```{r setup, include=FALSE}
 library(knitr)
+library(kableExtra)
 
 opts_chunk$set(echo = FALSE)
+options(knitr.kable.NA = '')
 
 inline_hook <- function(x){
   
@@ -209,9 +212,22 @@ This report provides a summary of current income and expenditure on a striclty c
 
 - Budgeted expenditure: £`r as.numeric(budget2223[18, 2])`
 
-- Budgeted deficit: £`r as.numeric(budget2223[18, 3])`
+- Budgeted deficit: £`r -(as.numeric(budget2223[18, 3]))`
 
 
+### Budget 2022-23
+
+```{r showbudget}
+budop <- bind_cols(budgetcats, budget2223, actuals2223,
+                   .name_repair = "minimal")
+
+
+budop %>% kbl() %>%
+  kable_classic(full_width = FALSE, "striped") %>%
+  column_spec(4, border_right = TRUE) %>%
+  add_header_above(c(" ","Budget" = 3, "Actuals" = 3))
+
+```
 
 ## Income and Expenditure
 
