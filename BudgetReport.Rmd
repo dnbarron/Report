@@ -3,7 +3,7 @@ title: "Treasurer's Report"
 author: "David Barron"
 date: "`r Sys.Date()`"
 output:
-  pdf_document
+  html_document
 ---
 
 ```{r setup, include=FALSE}
@@ -110,6 +110,11 @@ budgetcats <- read_xlsx("C:\\Users\\dnbar\\Dropbox\\TASO\\Accounts 2022-23\\TASO
 budget2324 <- read_xlsx("C:\\Users\\dnbar\\Dropbox\\TASO\\Accounts 2023-24\\TASO 2023-24.xlsm",
                  sheet = "Budget v Actuals",
                  range = "C3:E21")
+
+actuals2324 <- read_xlsx("C:\\Users\\dnbar\\Dropbox\\TASO\\Accounts 2023-24\\TASO 2023-24.xlsm",
+                 sheet = "Budget v Actuals",
+                 range = "G3:I21")
+
 
 budgetcats24 <- read_xlsx("C:\\Users\\dnbar\\Dropbox\\TASO\\Accounts 2023-24\\TASO 2023-24.xlsm",
                  sheet = "Budget v Actuals",
@@ -226,9 +231,24 @@ budop <- bind_cols(budgetcats, budget2223, actuals2223,
 budop %>% kbl() %>%
   kable_classic(full_width = FALSE, "striped") %>%
   column_spec(4, border_right = TRUE) %>%
-  add_header_above(c(" ","Budget" = 3, "Actuals" = 3)) 
-#%>%
+  add_header_above(c(" ","Budget" = 3, "Actuals" = 3)) # %>%
 #  as_image(width = 6)
+
+```
+
+### Budget 2023-24
+
+```{r shownewbudget}
+
+current_budop <- bind_cols(budgetcats, budget2324, actuals2324,
+                   .name_repair = "minimal")
+
+current_budop %>% kbl() %>%
+  kable_classic(full_width = FALSE, "striped") %>%
+  column_spec(4, border_right = TRUE) %>%
+  add_header_above(c(" ","Budget" = 3, "Actuals" = 3)) # %>%
+#  as_image(width = 6)
+
 
 ```
 
