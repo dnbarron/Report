@@ -96,24 +96,24 @@ dta.long <- dta.sum %>% pivot_longer(
 
 budget2223 <- read_xlsx("C:\\Users\\dnbar\\Dropbox\\TASO\\Accounts 2022-23\\TASO 2022-23.xlsm",
                  sheet = "Budget v Actuals",
-                 range = "C3:E21")
+                 range = "C3:E22")
 
 actuals2223 <- read_xlsx("C:\\Users\\dnbar\\Dropbox\\TASO\\Accounts 2022-23\\TASO 2022-23.xlsm",
                  sheet = "Budget v Actuals",
-                 range = "G3:I21")
+                 range = "G3:I22")
 
 budgetcats <- read_xlsx("C:\\Users\\dnbar\\Dropbox\\TASO\\Accounts 2022-23\\TASO 2022-23.xlsm",
                  sheet = "Budget v Actuals",
-                 range = "A4:A21",
+                 range = "A4:A22",
                  col_names = c("Category"))
 
 budget2324 <- read_xlsx("C:\\Users\\dnbar\\Dropbox\\TASO\\Accounts 2023-24\\TASO 2023-24.xlsm",
                  sheet = "Budget v Actuals",
-                 range = "C3:E21")
+                 range = "C3:E22")
 
 actuals2324 <- read_xlsx("C:\\Users\\dnbar\\Dropbox\\TASO\\Accounts 2023-24\\TASO 2023-24.xlsm",
                  sheet = "Budget v Actuals",
-                 range = "G3:I21")
+                 range = "G3:I22")
 
 
 budgetcats24 <- read_xlsx("C:\\Users\\dnbar\\Dropbox\\TASO\\Accounts 2023-24\\TASO 2023-24.xlsm",
@@ -213,11 +213,11 @@ This report provides a summary of current income and expenditure on a striclty c
 
 ## Budget
 
-- Budgeted income: £`r as.numeric(budget2223[18, 1])`
+- Budgeted income: £`r as.numeric(budget2223[19, 1])`
 
-- Budgeted expenditure: £`r as.numeric(budget2223[18, 2])`
+- Budgeted expenditure: £`r as.numeric(budget2223[19, 2])`
 
-- Budgeted deficit: £`r -(as.numeric(budget2223[18, 3]))`
+- Budgeted deficit: £`r -(as.numeric(budget2223[19, 3]))`
 
 
 
@@ -254,9 +254,12 @@ current_budop %>% kbl() %>%
 
 ## Income and Expenditure
 
-- Current total income is £`r as.numeric(dta.sum[num.months, 2])`
+- Total income since 1 July 2022 is £`r as.numeric(dta.sum[num.months, 2])`
 
-- Current total expenditure is £`r as.numeric(dta.sum[num.months, 3])`
+- Total expenditure since 1 July 2022 £`r as.numeric(dta.sum[num.months, 3])`
 
 - **The current deficit is £`r -as.numeric(dta.sum[num.months,2] - dta.sum[num.months,3])`**. 
 - Current bank balance £`r Bank_Balance`.
+
+- Number of subscriptions paid to date: 
+  `r format((actuals2223[2,1] / 45), nsmall = 0)`
