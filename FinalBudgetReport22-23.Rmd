@@ -1,9 +1,9 @@
 ---
-title: "Treasurer's Report"
+title: "Treasurer's End of Year Report"
 author: "David Barron"
-date: "`r Sys.Date()`"
+date: "30 June 2023"
 output:
-  html_document
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -207,7 +207,7 @@ dta.long  %>%
 
 ```
 
-This report provides a summary of current income and expenditure on a striclty cash basis for the TASO financial year 2023-24, providing comparisons with the 2022-23 financial year.  No account is taken of payments made or received that relate to activities in a different financial year (although such adjustments are of course made in our annual accounts).  This should not affect the trends shown in the chart, because these payments generally repeat every year.  For example, payments are made in advance to Rewley House to book their lecture theatre for study days in the financial year before they occur, but this happens every year.
+This report provides a summary of income and expenditure on a striclty cash basis for the TASO financial year 2023-24.  No account is taken of payments made or received that relate to activities in a different financial year (although such adjustments are of course made in our annual accounts).
 
 ---
 
@@ -221,7 +221,6 @@ This report provides a summary of current income and expenditure on a striclty c
 
 
 
-### Budget 2022-23
 
 ```{r showbudget}
 
@@ -236,30 +235,26 @@ budop %>% kbl() %>%
 
 ```
 
-### Budget 2023-24
-
-```{r shownewbudget}
-
-current_budop <- bind_cols(budgetcats, budget2324, actuals2324,
-                   .name_repair = "minimal")
-
-current_budop %>% kbl() %>%
-  kable_classic(full_width = FALSE, "striped") %>%
-  column_spec(4, border_right = TRUE) %>%
-  add_header_above(c(" ","Budget" = 3, "Actuals" = 3)) # %>%
-#  as_image(width = 6)
-
-
-```
 
 ## Income and Expenditure
 
-- Total income since 1 July 2022 is £`r as.numeric(dta.sum[num.months, 2])`
+- Total income in 2022-23: £`r as.numeric(dta.sum[num.months, 2])`
 
-- Total expenditure since 1 July 2022 £`r as.numeric(dta.sum[num.months, 3])`
+- Total expenditure is 2022-23: £`r as.numeric(dta.sum[num.months, 3])`
 
-- **The current deficit is £`r -as.numeric(dta.sum[num.months,2] - dta.sum[num.months,3])`**. 
-- Current bank balance £`r Bank_Balance`.
+- **Financial year end deficit is £`r -as.numeric(dta.sum[num.months,2] - dta.sum[num.months,3])`**. 
 
-- Number of subscriptions paid to date: 
+- Bank balance on 30 June 2023: £`r Bank_Balance`.
+
+- Number of subscriptions paid by 30 June: 
   `r format((actuals2223[2,3] / 45), nsmall = 0)`
+  
+## Comments
+
+-  Subscriptions received to date are about £4k lower than anticipated.  No doubt these will be received in July.
+
+-  Charitable grants still to be paid come to £`r 14100 - 12360`.
+
+-  The invoice from Magdalen for June's lecture has not yet been received.
+
+-  Deposits have been paid to Rewley House for 2023-24's study days. 
