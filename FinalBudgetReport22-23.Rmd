@@ -3,7 +3,9 @@ title: "Treasurer's End of Year Report"
 author: "David Barron"
 date: "30 June 2023"
 output:
+  word_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -207,7 +209,7 @@ dta.long  %>%
 
 ```
 
-This report provides a summary of income and expenditure on a striclty cash basis for the TASO financial year 2023-24.  No account is taken of payments made or received that relate to activities in a different financial year (although such adjustments are of course made in our annual accounts).
+This report provides a summary of income and expenditure on a striclty cash basis for the TASO financial year 2022-23.  No account is taken of payments made or received that relate to activities in a different financial year (although such adjustments are of course made in our annual accounts).
 
 ---
 
@@ -230,8 +232,8 @@ budop <- bind_cols(budgetcats, budget2223, actuals2223,
 budop %>% kbl() %>%
   kable_classic(full_width = FALSE, "striped") %>%
   column_spec(4, border_right = TRUE) %>%
-  add_header_above(c(" ","Budget" = 3, "Actuals" = 3)) # %>%
-#  as_image(width = 6)
+  add_header_above(c(" ","Budget" = 3, "Actuals" = 3))  %>%
+  as_image(width = 6)
 
 ```
 
@@ -251,7 +253,7 @@ budop %>% kbl() %>%
   
 ## Comments
 
--  Subscriptions received to date are about £4k lower than anticipated.  No doubt these will be received in July.
+-  Subscriptions received to date are about £4k lower than anticipated.
 
 -  Charitable grants still to be paid come to £`r 14100 - 12360`.
 

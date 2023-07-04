@@ -41,7 +41,7 @@ dta <- read_xlsx("C:\\Users\\dnbar\\Dropbox\\TASO\\Accounts 2022-23\\TASO 2022-2
                  col_types = c("date", rep("guess", 11)))
 
 nrows <- nrow(dta)
-Bank_Balance <- as.numeric(dta[nrows, "Balance"])
+
 
 dta.sum <- dta %>%
           mutate(Date = lubridate::ymd(Date),
@@ -125,7 +125,7 @@ budgetcats24 <- read_xlsx("C:\\Users\\dnbar\\Dropbox\\TASO\\Accounts 2023-24\\TA
 ```
 
 
-```{r currentdata,  eval=FALSE}
+```{r currentdata}
 
 dta.current <- read_xlsx("C:\\Users\\dnbar\\Dropbox\\TASO\\Accounts 2023-24\\TASO 2023-24.xlsm",
                  sheet = "Transactions",
@@ -188,16 +188,20 @@ dta.current.long <- dta.current.sum %>% pivot_longer(
 
 
 ```{r plot, echo=FALSE}
-num.months <- dim(dta.sum)[1]
+num.months <- dim(dta.current.sum)[1]
 
 all.months <- c(month.abb[7:12], month.abb[1:6])
 labels = all.months[1:num.months]
 
-dta.long  %>%
-  ggplot(aes(x = Month, y = Amount, colour = Type)) + 
+plot.dta.current.long <- bind_cols(dta.current.long, Year = "Current")
+plot.dta.long <- bind_cols(dta.long, Year = "Past")
+plot.dta <- bind_rows(plot.dta.long, plot.dta.current.long)
+
+plot.dta  %>%
+  ggplot(aes(x = Month, y = Amount, colour = Type, linetype = Year )) + 
           geom_line() + scale_x_continuous(
-            breaks = 1:num.months,
-            label =  labels
+            breaks = 1:12,
+            label =  all.months
           ) + 
   scale_y_continuous(label = scales::label_dollar(prefix="£")) +
   theme_light() +
@@ -213,11 +217,11 @@ This report provides a summary of current income and expenditure on a striclty c
 
 ## Budget
 
-- Budgeted income: £`r as.numeric(budget2223[19, 1])`
+- Budgeted income: £`r as.numeric(budget2324[19, 1])`
 
-- Budgeted expenditure: £`r as.numeric(budget2223[19, 2])`
+- Budgeted expenditure: £`r as.numeric(budget2324[19, 2])`
 
-- Budgeted deficit: £`r -(as.numeric(budget2223[19, 3]))`
+- Budgeted deficit: £`r -(as.numeric(budget2324[19, 3]))`
 
 
 
@@ -254,12 +258,12 @@ current_budop %>% kbl() %>%
 
 ## Income and Expenditure
 
-- Total income since 1 July 2022 is £`r as.numeric(dta.sum[num.months, 2])`
+- Total income since 1 July 2023 is £`r as.numeric(dta.current.sum[num.months, 2])`
 
-- Total expenditure since 1 July 2022 £`r as.numeric(dta.sum[num.months, 3])`
+- Total expenditure since 1 July 2023 £`r as.numeric(dta.current.sum[num.months, 3])`
 
-- **The current deficit is £`r -as.numeric(dta.sum[num.months,2] - dta.sum[num.months,3])`**. 
+- **The current surplus is £`r as.numeric(dta.current.sum[num.months,2] - dta.current.sum[num.months,3])`**.
+
 - Current bank balance £`r Bank_Balance`.
 
-- Number of subscriptions paid to date: 
-  `r format((actuals2223[2,3] / 45), nsmall = 0)`
+
