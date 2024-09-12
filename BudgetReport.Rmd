@@ -1,0 +1,289 @@
+---
+title: "Treasurer's Report"
+author: "David Barron"
+date: "`r format(Sys.Date(), '%d %B %Y' )`"
+output:
+  html_document: default
+  #pdf_document: default
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+library(kableExtra)
+
+opts_chunk$set(echo = FALSE)
+options(knitr.kable.NA = '')
+
+inline_hook <- function(x){
+  
+  format(x, nsmall = 2, scientific = FALSE, big.mark = ",")
+  
+  
+}
+
+knit_hooks$set(inline = inline_hook)
+
+```
+
+
+
+```{r pastdata, echo=FALSE, message=FALSE}
+
+library(readxl)
+library(tidyverse)
+
+dta <- read_xlsx("C:\\Users\\dnbar\\Dropbox\\TASO\\Accounts 2023-24\\TASO 2023-24.xlsm",
+                 sheet = "Transactions",
+                 skip = 3,
+                 col_names = c("Date", "Ref", "Details", "Expenditure", "Income",
+                               "Balance", "Income Category", "Expenditure Category",
+                               "Funding Category", "I/E", "Amount", "I/E Category"
+                               ),
+                 col_types = c("date", rep("guess", 11)))
+
+nrows <- nrow(dta)
+
+
+dta.sum <- dta %>%
+          mutate(Date = lubridate::ymd(Date),
+                 Month = lubridate::month(Date)) %>%
+        group_by(Month) %>%
+        summarise(
+         Expend = sum(Expenditure, na.rm = TRUE),
+         Inc = sum(Income, na.rm = TRUE)
+        ) %>%
+        mutate(Month = case_when(
+                          Month == 7 ~ 1,
+                          Month == 8 ~ 2,
+                          Month == 9 ~ 3,
+                          Month == 10 ~ 4,
+                          Month == 11 ~ 5,
+                          Month == 12 ~ 6, 
+                          Month == 1 ~ 7,
+                          Month == 2 ~ 8,
+                          Month == 3 ~ 9,
+                          Month == 4 ~ 10,
+                          Month == 5 ~ 11,
+                          Month == 6 ~ 12)) %>%
+       arrange(Month)
+
+# Reorder rows
+
+  
+  
+  #dta.sum$Month <- as.numeric(row.names(dta.sum))
+
+dta.sum <-  dta.sum %>%
+    mutate(
+          Income = cumsum(Inc),
+          Expenditure = cumsum(Expend)
+        ) %>%
+        select(Month, Income, Expenditure)
+
+
+dta.long <- dta.sum %>% pivot_longer(
+              cols = Income:Expenditure,
+              names_to = "Type",
+              values_to = "Amount"
+              ) 
+  
+
+          
+
+```
+
+
+```{r, budget}
+
+budget2324 <- read_xlsx("C:\\Users\\dnbar\\Dropbox\\TASO\\Accounts 2023-24\\TASO 2023-24.xlsm",
+                 sheet = "Budget v Actuals",
+                 range = "C3:E22")
+
+actuals2324 <- read_xlsx("C:\\Users\\dnbar\\Dropbox\\TASO\\Accounts 2023-24\\TASO 2023-24.xlsm",
+                 sheet = "Budget v Actuals",
+                 range = "G3:I22")
+
+# budgetcats <- read_xlsx("C:\\Users\\dnbar\\Dropbox\\TASO\\Accounts 2022-23\\TASO 2022-23.xlsm",
+#                  sheet = "Budget v Actuals",
+#                  range = "A4:A22",
+#                  col_names = c("Category"))
+
+budget2425 <- read_xlsx("C:\\Users\\dnbar\\Dropbox\\TASO\\Accounts 2024-25\\TASO 2024-25.xlsm",
+                 sheet = "Budget v Actuals",
+                 range = "C3:E21")
+
+actuals2425 <- read_xlsx("C:\\Users\\dnbar\\Dropbox\\TASO\\Accounts 2024-25\\TASO 2024-25.xlsm",
+                 sheet = "Budget v Actuals",
+                 range = "G3:I21")
+
+
+budgetcats <- read_xlsx("C:\\Users\\dnbar\\Dropbox\\TASO\\Accounts 2024-25\\TASO 2024-25.xlsm",
+                 sheet = "Budget v Actuals",
+                 range = "A4:A21",
+                 col_names = c("Category"))
+
+budgetRows <- nrow(budget2425)
+
+```
+
+
+```{r currentdata}
+
+dta.current <- read_xlsx("C:\\Users\\dnbar\\Dropbox\\TASO\\Accounts 2024-25\\TASO 2024-25.xlsm",
+                 sheet = "Transactions",
+                 skip = 3,
+                 col_names = c("Date", "Ref", "Details", "Expenditure", "Income",
+                               "Balance", "Income Category", "Expenditure Category",
+                               "Funding Category", "I/E", "Amount", "I/E Category"
+                               ),
+                 col_types = c("date", rep("guess", 11)))
+
+nrows <- nrow(dta.current)
+Bank_Balance <- as.numeric(dta.current[nrows, "Balance"])
+
+dta.current.sum <- dta.current %>%
+          mutate(Date = lubridate::ymd(Date),
+                 Month = lubridate::month(Date)) %>%
+        group_by(Month) %>%
+        summarise(
+         Expend = sum(Expenditure, na.rm = TRUE),
+         Inc = sum(Income, na.rm = TRUE)
+        ) %>%
+        mutate(Month = case_when(
+                          Month == 7 ~ 1,
+                          Month == 8 ~ 2,
+                          Month == 9 ~ 3,
+                          Month == 10 ~ 4,
+                          Month == 11 ~ 5,
+                          Month == 12 ~ 6, 
+                          Month == 1 ~ 7,
+                          Month == 2 ~ 8,
+                          Month == 3 ~ 9,
+                          Month == 4 ~ 10,
+                          Month == 5 ~ 11,
+                          Month == 6 ~ 12)) %>%
+       arrange(Month)
+
+# Reorder rows
+
+  
+  
+  #dta.sum$Month <- as.numeric(row.names(dta.sum))
+
+dta.current.sum <-  dta.current.sum %>%
+    mutate(
+          Income = cumsum(Inc),
+          Expenditure = cumsum(Expend)
+        ) %>%
+        select(Month, Income, Expenditure)
+
+
+dta.current.long <- dta.current.sum %>% pivot_longer(
+              cols = Income:Expenditure,
+              names_to = "Type",
+              values_to = "Amount"
+              ) 
+
+
+```
+
+
+
+```{r plot, echo=FALSE}
+num.months <- dim(dta.current.sum)[1]
+
+all.months <- c(month.abb[7:12], month.abb[1:6])
+labels = all.months[1:num.months]
+
+plot.dta.current.long <- bind_cols(dta.current.long, Year = "Current")
+plot.dta.long <- bind_cols(dta.long, Year = "Past")
+plot.dta <- bind_rows(plot.dta.long, plot.dta.current.long)
+
+plot.dta  %>%
+  ggplot(aes(x = Month, y = Amount, colour = Type)) + 
+          geom_point(data = subset(plot.dta, Year == "Past"), alpha = 0.75) +
+          geom_line(data = subset(plot.dta, Year == "Current")) +
+          scale_x_continuous(
+            breaks = 1:12,
+            minor_breaks = NULL,
+            label =  all.months
+          ) + 
+  scale_y_continuous(label = scales::label_dollar(prefix="£")) +
+  theme_light() +
+  labs(caption = "Dot: previous year; Line: current year") +
+  theme(legend.position="inside", legend.position.inside=c(0.2, 0.75), 
+        legend.title = element_blank()) 
+          
+
+```
+
+This report provides a summary of current income and expenditure on a striclty cash basis for the TASO financial year 2023-24, providing comparisons with the 2022-23 financial year.  No account is taken of payments made or received that relate to activities in a different financial year (although such adjustments are of course made in our annual accounts).  This should not affect the trends shown in the chart, because these payments generally repeat every year.  For example, payments are made in advance to Rewley House to book their lecture theatre for study days in the financial year before they occur, but this happens every year.
+
+---
+
+## Budget 2024-25
+
+- Budgeted income: £`r as.numeric(budget2425[budgetRows, 1])`
+
+- Budgeted expenditure: £`r as.numeric(budget2425[budgetRows, 2])`
+
+- Budgeted deficit: £`r -(as.numeric(budget2425[budgetRows, 3]))`
+
+
+
+
+
+```{r showbudget, eval=FALSE}
+
+budop <- bind_cols(budgetcats, budget2223, actuals2223,
+                   .name_repair = "minimal")
+
+budop %>% kbl(format.args = list(nsmall = 2)) %>%
+  kable_classic(full_width = FALSE, "striped") %>%
+  column_spec(4, border_right = TRUE) %>%
+  add_header_above(c(" ","Budget" = 3, "Actuals" = 3)) # %>%
+#  as_image(width = 6)
+
+```
+
+
+
+```{r shownewbudget}
+
+current_budop <- bind_cols(budgetcats, budget2425, actuals2425,
+                   .name_repair = "minimal")
+
+current_budop %>% kbl(format.args = list(nsmall = 2)) %>%
+  kable_classic(full_width = FALSE, "striped") %>%
+  column_spec(4, border_right = TRUE) %>%
+  add_header_above(c(" ","Budget" = 3, "Actuals" = 3)) #%>%
+  #as_image(width = 6)
+
+
+```
+
+## Income and Expenditure
+
+- Total income since 1 July 2024 is £`r as.numeric(dta.current.sum[num.months, 2])`
+
+- Total expenditure since 1 July 2024 £`r as.numeric(dta.current.sum[num.months, 3])`
+
+- **The current `r ifelse(dta.current.sum[num.months,2] - dta.current.sum[num.months, 3] > 0, "surplus", "deficit")` is £`r as.numeric(dta.current.sum[num.months,2] - dta.current.sum[num.months,3])`**.
+
+- Current bank balance £`r Bank_Balance`.
+
+## Comments
+
+
+```{r subscriptions, eval=TRUE, message = FALSE}
+library(googlesheets4)
+
+subs <- dta.current %>%
+  filter(`Income Category`=="Subscriptions 2024/25") %>%
+  select(Income) 
+
+
+total_subs <- 20260 + sum(subs)
+```
+
+- Total subscription income to date, from previous and current financial years: £`r total_subs`. (The total budget across both financial years is £24,550.) 
