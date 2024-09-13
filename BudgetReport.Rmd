@@ -286,4 +286,4 @@ subs <- dta.current %>%
 total_subs <- 20260 + sum(subs)
 ```
 
-- Total subscription income to date, from previous and current financial years: £`r total_subs`. (The total budget across both financial years is £24,550.) 
+- Total subscription income to date, from previous and current financial years: £`r total_subs`. (The total budget across both financial years is £24,550.00) 
