@@ -3,8 +3,8 @@ title: "Treasurer's Report"
 author: "David Barron"
 date: "`r format(Sys.Date(), '%d %B %Y' )`"
 output:
+  pdf_document: default
   html_document: default
-  #pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
